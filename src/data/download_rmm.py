@@ -59,7 +59,8 @@ def download_rmm(config: dict) -> Path:
         return dest
 
     print(f"[RMM] Downloading from {url}")
-    response = requests.get(url, timeout=60)
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, timeout=60, headers=headers)
     response.raise_for_status()
     dest.write_bytes(response.content)
     print(f"[RMM] Saved to {dest}")

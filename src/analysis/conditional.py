@@ -177,17 +177,19 @@ def _fit_stratum(
 
     lats = da.lat.values
     lons = da.lon.values
-    wet_threshold = config["analysis"]["wet_threshold"]
-    min_samples   = config["analysis"]["min_samples"]
+    min_samples = config["analysis"]["min_samples"]
 
-    # Build work units: one per latitude row
+    # Build work units: one per latitude row — must match _fit_lat_row signature
+    # args: (row_idx, row_data_2d, min_samples)  shape of row_data: (n_time, n_lon)
     lat_chunks = [
-        (i_lat, lat, da_sub.sel(lat=lat).values, wet_threshold, min_samples)
+        (i_lat, da_sub.sel(lat=lat).values, min_samples)
         for i_lat, lat in enumerate(lats)
     ]
 
     # ── parallel fitting ──────────────────────────────────────────────────
-    rows_dict: dict[int, list] = {}
+    n_lat, n_lon = len(lats), len(lons)
+    arrays = {key: np.full((n_lat, n_lon), np.nan) for key in _ROW_KEYS}
+
     with ProcessPoolExecutor(max_workers=n_workers) as pool:
         futures = {pool.submit(_fit_lat_row, chunk): chunk[0] for chunk in lat_chunks}
         for fut in tqdm(
@@ -196,17 +198,9 @@ def _fit_stratum(
             desc=f"  {stratum_label} (n={n_windows})",
             leave=False,
         ):
-            i_lat = futures[fut]
-            rows_dict[i_lat] = fut.result()
-
-    # ── assemble into 2-D arrays ──────────────────────────────────────────
-    n_lat, n_lon = len(lats), len(lons)
-    arrays = {key: np.full((n_lat, n_lon), np.nan) for key in _ROW_KEYS}
-
-    for i_lat in range(n_lat):
-        for i_lon, row in enumerate(rows_dict[i_lat]):
-            for key, val in zip(_ROW_KEYS, row):
-                arrays[key][i_lat, i_lon] = val
+            row_idx, row = fut.result()
+            for k in _ROW_KEYS:
+                arrays[k][row_idx, :] = row[k]
 
     # ── build xr.Dataset ─────────────────────────────────────────────────
     ds = xr.Dataset(
@@ -215,7 +209,7 @@ def _fit_stratum(
     )
     ds.attrs["n_windows"]     = n_windows
     ds.attrs["stratum_label"] = stratum_label
-    ds.attrs["wet_threshold"] = wet_threshold
+    ds.attrs["wet_threshold"] = config["analysis"]["wet_threshold"]
     ds.attrs["min_samples"]   = min_samples
 
     return ds
