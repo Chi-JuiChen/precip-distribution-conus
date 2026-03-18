@@ -1,0 +1,63 @@
+# =============================================================================
+# Precipitation Distribution Analysis - Configuration
+# =============================================================================
+
+# --- Time period ---
+years:
+  start: 2001
+  end: 2020
+
+# --- Analysis parameters ---
+analysis:
+  wet_threshold: 0.1        # mm/day — minimum to count as a wet day
+  rolling_days: 7           # days for rolling average
+  min_samples: 30           # minimum wet-day samples required to fit a distribution
+  target_resolution: 0.25   # degrees (output grid spacing)
+
+# --- CONUS domain ---
+domain:
+  lat_min: 24.0
+  lat_max: 50.0
+  lon_min: -125.0
+  lon_max: -66.0
+
+# --- Data paths (relative to project root) ---
+paths:
+  raw_cpc:       data/raw/cpc
+  raw_imerg:     data/raw/imerg
+  processed_cpc: data/processed/cpc
+  processed_imerg: data/processed/imerg
+  output_stats:  output/stats
+  output_figures: output/figures
+
+# --- CPC download ---
+cpc:
+  # NOAA PSL HTTP server (no account needed)
+  base_url: "https://downloads.psl.noaa.gov/Datasets/cpc_us_precip"
+  rt_url:   "https://downloads.psl.noaa.gov/Datasets/cpc_us_precip/RT"
+  # File naming: precip.V1.0.{YYYY}.nc  (both main and RT directories)
+  filename_template: "precip.V1.0.{year}.nc"
+  # Years 2007+ are in /RT/ subdirectory; ≤2006 are in the main directory
+  rt_start_year: 2007
+  variable: "precip"      # variable name inside NetCDF
+  fill_value: -9.96921e+36
+
+# --- IMERG v07 download ---
+imerg:
+  # NASA GES DISC (requires Earthdata account + ~/.netrc)
+  base_url: "https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGHH.07"
+  # Daily accumulated product
+  daily_url: "https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/GPM_3IMERGDF.07"
+  variable: "precipitation"       # mm/hr in v07 daily product (× 24 → mm/day)
+  # Regridding method for xesmf
+  regrid_method: "conservative"
+
+# --- Visualization ---
+visualization:
+  dpi: 150
+  figsize: [14, 8]      # inches for single map
+  figsize_panel: [18, 12]  # inches for 6-panel figure
+  cmap_delta_aic: "RdBu_r"   # diverging: blue=lognorm better, red=gamma better
+  cmap_ks: "YlOrRd"
+  cmap_pval: "RdYlGn"
+  cmap_best_fit: "bwr"

@@ -1,0 +1,16 @@
+name: atmo
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy>=1.24
+  - xarray>=2023.1
+  - scipy>=1.10
+  - matplotlib>=3.7
+  - cartopy>=0.21
+  - xesmf>=0.7
+  - netCDF4>=1.6
+  - h5py>=3.8
+  - tqdm>=4.65
+  - pyyaml>=6.0
+  - requests>=2.31

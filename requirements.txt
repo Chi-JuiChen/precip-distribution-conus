@@ -1,0 +1,16 @@
+# Prefer conda-forge for all packages (see environment.yml):
+#   conda install -c conda-forge numpy xarray scipy matplotlib \
+#       cartopy xesmf netCDF4 h5py tqdm pyyaml requests
+#
+# This file is for reference only — do not use pip install -r requirements.txt.
+numpy>=1.24
+xarray>=2023.1
+scipy>=1.10
+matplotlib>=3.7
+cartopy>=0.21
+xesmf>=0.7
+netCDF4>=1.6
+h5py>=3.8
+tqdm>=4.65
+pyyaml>=6.0
+requests>=2.31
