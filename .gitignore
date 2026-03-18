@@ -21,7 +21,8 @@ data/raw/
 data/processed/
 
 # ── Pipeline outputs (binary, regeneratable) ─────────────────────────────
-output/stats/
+output/unconditional/stats/
+output/conditional/stats/
 
 # ── Python cache ──────────────────────────────────────────────────────────
 __pycache__/

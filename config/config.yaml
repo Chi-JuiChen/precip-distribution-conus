@@ -27,8 +27,38 @@ paths:
   raw_imerg:     data/raw/imerg
   processed_cpc: data/processed/cpc
   processed_imerg: data/processed/imerg
-  output_stats:  output/stats
-  output_figures: output/figures
+  # Climate index files (ONI, RMM) — downloaded once, committed to git
+  indices:       data/indices
+  # Unconditional analysis outputs (all-years, no conditioning)
+  output_stats:   output/unconditional/stats
+  output_figures: output/unconditional/figures
+  # Conditional analysis outputs (stratified by season / ENSO / MJO)
+  conditional_stats:   output/conditional/stats
+  conditional_figures: output/conditional/figures
+
+# --- Conditional analysis parameters ---
+# References:
+#   ENSO — Johnson et al. (2014, Wea. Fcst.); NOAA CPC ONI definition
+#   MJO  — Wheeler & Hendon (2004, MWR); Johnson et al. (2014)
+conditional:
+  enso_threshold: 0.5          # |Niño 3.4 3-month mean| >= threshold → El Niño / La Niña
+  mjo_amp_threshold: 1.0       # RMM amplitude >= threshold → active MJO (unanimous in literature)
+  mjo_n_phases: 8              # always use all 8 phases individually
+  seasons: [DJF, MAM, JJA, SON]
+  enso_phases: [el_nino, neutral, la_nina]
+
+# --- ONI index download (Niño 3.4 monthly SST anomaly) ---
+oni:
+  # NOAA CPC SST index file — monthly, all Niño regions, free download
+  url: "https://www.cpc.ncep.noaa.gov/data/indices/sstoi.indices"
+  filename: "sstoi.indices"
+
+# --- RMM index download (Wheeler & Hendon 2004 MJO index) ---
+rmm:
+  # Bureau of Meteorology (BoM), Australia — daily RMM1, RMM2, phase, amplitude
+  url: "http://www.bom.gov.au/climate/mjo/graphics/rmm.74toRealtime.txt"
+  filename: "rmm.74toRealtime.txt"
+  missing_value: 999.0
 
 # --- CPC download ---
 cpc:
