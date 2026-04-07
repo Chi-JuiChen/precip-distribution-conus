@@ -18,7 +18,7 @@ Algorithm (per cell)
 For each candidate threshold T in THRESHOLDS:
   1. Compute POP = fraction of windows above T
   2. If n_wet < min_samples → skip
-  3. Fit Pearson III (floc=0) to wet values
+  3. Fit Pearson III (loc free) to wet values
   4. Compute KS statistic D (lower = better P3 fit)
 Choose T* = argmin(D) among valid thresholds.
 
@@ -97,7 +97,7 @@ def _fit_cell_thresholds(args):
         if n_wet < min_samples:
             continue
         try:
-            skew, loc, scale = stats.pearson3.fit(wet, floc=0)
+            skew, loc, scale = stats.pearson3.fit(wet)
             D, _ = stats.kstest(wet, 'pearson3', args=(skew, loc, scale))
         except Exception:
             continue
@@ -309,7 +309,7 @@ def city_threshold_analysis(
         entry = {'threshold': T, 'pop': n_wet / n_total, 'n_wetdays': n_wet}
         if n_wet >= min_samples:
             try:
-                skew, loc, scale = stats.pearson3.fit(wet, floc=0)
+                skew, loc, scale = stats.pearson3.fit(wet)
                 D, pval          = stats.kstest(wet, 'pearson3',
                                                 args=(skew, loc, scale))
                 entry.update({'p3_skew': skew, 'p3_loc': loc,
